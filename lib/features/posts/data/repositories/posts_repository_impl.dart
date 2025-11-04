@@ -34,5 +34,37 @@ class PostsRepositoryImpl implements PostsRepository {
   Stream<List<PostEntity>> getPosts() {
     return remoteDataSource.getPosts();
   }
+
+  @override
+  Future<Either<Failure, void>> toggleLike({
+    required String postId,
+    required String userId,
+  }) async {
+    try {
+      await remoteDataSource.toggleLike(
+        postId: postId,
+        userId: userId,
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<bool> isPostLikedByUser({
+    required String postId,
+    required String userId,
+  }) async {
+    return await remoteDataSource.isPostLikedByUser(
+      postId: postId,
+      userId: userId,
+    );
+  }
+
+  @override
+  Stream<int> getLikesCount(String postId) {
+    return remoteDataSource.getLikesCount(postId);
+  }
 }
 

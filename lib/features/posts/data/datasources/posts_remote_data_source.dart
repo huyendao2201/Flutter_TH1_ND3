@@ -14,6 +14,18 @@ abstract class PostsRemoteDataSource {
   });
 
   Stream<List<PostEntity>> getPosts();
+  
+  Future<void> toggleLike({
+    required String postId,
+    required String userId,
+  });
+  
+  Future<bool> isPostLikedByUser({
+    required String postId,
+    required String userId,
+  });
+  
+  Stream<int> getLikesCount(String postId);
 }
 
 class PostsRemoteDataSourceImpl implements PostsRemoteDataSource {
@@ -85,6 +97,102 @@ class PostsRemoteDataSourceImpl implements PostsRemoteDataSource {
       });
     } catch (e) {
       throw Exception('Không nhận được bài viết: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<void> toggleLike({
+    required String postId,
+    required String userId,
+  }) async {
+    try {
+      final likeDocRef = _firestore
+          .collection(FirebaseConstants.postsCollection)
+          .doc(postId)
+          .collection('likes')
+          .doc(userId);
+
+      final likeDoc = await likeDocRef.get();
+      final postRef = _firestore
+          .collection(FirebaseConstants.postsCollection)
+          .doc(postId);
+
+      // Get current post data to ensure likes field exists and is valid
+      final postDoc = await postRef.get();
+      final postData = postDoc.data();
+      
+      // Initialize or fix likes field if it doesn't exist or is negative
+      if (postData != null) {
+        final currentLikes = postData['likes'] as int?;
+        if (currentLikes == null || currentLikes < 0) {
+          await postRef.update({'likes': 0});
+        }
+      }
+
+      if (likeDoc.exists) {
+        // Unlike: remove like document and decrease likes count
+        await likeDocRef.delete();
+        // Get updated data after initialization
+        final updatedDoc = await postRef.get();
+        final updatedData = updatedDoc.data();
+        final currentLikes = (updatedData?['likes'] as int?) ?? 0;
+        
+        // Only decrement if likes > 0
+        if (currentLikes > 0) {
+          await postRef.update({
+            'likes': FieldValue.increment(-1),
+          });
+        }
+      } else {
+        // Like: add like document and increase likes count
+        await likeDocRef.set({
+          'userId': userId,
+          'likedAt': FieldValue.serverTimestamp(),
+        });
+        await postRef.update({
+          'likes': FieldValue.increment(1),
+        });
+      }
+    } catch (e) {
+      throw Exception('Không thể like/unlike bài viết: ${e.toString()}');
+    }
+  }
+
+  @override
+  Future<bool> isPostLikedByUser({
+    required String postId,
+    required String userId,
+  }) async {
+    try {
+      final likeDoc = await _firestore
+          .collection(FirebaseConstants.postsCollection)
+          .doc(postId)
+          .collection('likes')
+          .doc(userId)
+          .get();
+
+      return likeDoc.exists;
+    } catch (e) {
+      // Log error but don't crash - just return false
+      print('Error checking if post is liked: $e');
+      return false;
+    }
+  }
+
+  @override
+  Stream<int> getLikesCount(String postId) {
+    try {
+      return _firestore
+          .collection(FirebaseConstants.postsCollection)
+          .doc(postId)
+          .snapshots()
+          .map((doc) {
+        if (!doc.exists) return 0;
+        final data = doc.data();
+        return data?['likes'] ?? 0;
+      });
+    } catch (e) {
+      return Stream.value(0);
     }
   }
 }

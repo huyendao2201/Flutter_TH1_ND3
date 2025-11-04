@@ -12,5 +12,17 @@ abstract class PostsRepository {
   });
 
   Stream<List<PostEntity>> getPosts();
+  
+  Future<Either<Failure, void>> toggleLike({
+    required String postId,
+    required String userId,
+  });
+  
+  Future<bool> isPostLikedByUser({
+    required String postId,
+    required String userId,
+  });
+  
+  Stream<int> getLikesCount(String postId);
 }
 
