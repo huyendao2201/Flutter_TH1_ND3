@@ -52,7 +52,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final user = userCredential.user;
       if (user == null) {
-        throw Exception('User not found');
+        throw Exception('Không tìm thấy người dùng');
       }
 
       final userDoc = await _firestore
@@ -61,12 +61,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           .get();
 
       if (!userDoc.exists) {
-        throw Exception('User data not found');
+        throw Exception('Không tìm thấy dữ liệu người dùng');
       }
 
       return UserModel.fromFirestore(userDoc);
     } catch (e) {
-      throw Exception('Failed to sign in: ${e.toString()}');
+      throw Exception('Không đăng nhập được: ${e.toString()}');
     }
   }
 
@@ -84,7 +84,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final user = userCredential.user;
       if (user == null) {
-        throw Exception('Failed to create user');
+        throw Exception('Không tạo được người dùng');
       }
 
       final userModel = UserModel(
@@ -100,7 +100,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return userModel;
     } catch (e) {
-      throw Exception('Failed to sign up: ${e.toString()}');
+      throw Exception('Không đăng ký được: ${e.toString()}');
     }
   }
 
@@ -109,7 +109,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       await _firebaseAuth.signOut();
     } catch (e) {
-      throw Exception('Failed to sign out: ${e.toString()}');
+      throw Exception('Không thể đăng xuất: ${e.toString()}');
     }
   }
 }

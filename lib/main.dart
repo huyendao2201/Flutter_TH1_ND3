@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'core/di/service_locator.dart';
 import 'features/auth/presentation/widgets/auth_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase
-  await Firebase.initializeApp();
-  
-  // Initialize Service Locator
-  final serviceLocator = ServiceLocator();
-  serviceLocator.init();
-  
-  runApp(MyApp(serviceLocator: serviceLocator));
+  try {
+    // Initialize Firebase với options cho từng platform
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    
+    // Initialize Service Locator
+    final serviceLocator = ServiceLocator();
+    serviceLocator.init();
+    
+    runApp(MyApp(serviceLocator: serviceLocator));
+  } catch (e) {
+    // Hiển thị lỗi nếu Firebase init thất bại
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('Error initializing app: $e'),
+        ),
+      ),
+    ));
+  }
 }
 
 class MyApp extends StatelessWidget {

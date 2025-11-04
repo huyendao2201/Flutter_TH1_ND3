@@ -67,7 +67,7 @@ class PostsRemoteDataSourceImpl implements PostsRemoteDataSource {
           .collection(FirebaseConstants.postsCollection)
           .add(postModel.toFirestore());
     } catch (e) {
-      throw Exception('Failed to create post: ${e.toString()}');
+      throw Exception('Không tạo được bài đăng: ${e.toString()}');
     }
   }
 
@@ -84,7 +84,7 @@ class PostsRemoteDataSourceImpl implements PostsRemoteDataSource {
             .toList();
       });
     } catch (e) {
-      throw Exception('Failed to get posts: ${e.toString()}');
+      throw Exception('Không nhận được bài viết: ${e.toString()}');
     }
   }
 }
