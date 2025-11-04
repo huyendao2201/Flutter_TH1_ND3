@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "939391840043",
+    "project_id": "flutter-mxh",
+    "storage_bucket": "flutter-mxh.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939391840043:android:e889d41e2c44af19449f6e",
+        "android_client_info": {
+          "package_name": "com.example.flutter_mxh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUTI6qRtrTcVCsawJGZkKAR0MKbrT0WS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
